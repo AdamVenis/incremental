@@ -1,46 +1,59 @@
 var seconds = 0;
-var money = document.getElementById('money');
-var energy = document.getElementById('energy');
+var dt = 300;
 
-var moneyValue = 0;
-var energyValue = 100;
-var day = 0;
-var income = 0.001;
-var dt = 100;
+const state = {
+	money: 0,
+	energy: 100,
+	day: 0,
+	income: 0.001,
+	upgrades: {
+		doubleIncome: {
+			unlocked: false,
+			researched: false
+		}
+	},
+};
 
-var doubleIncomeConsumed = 0;
+var upgradeData = {
+	doubleIncome: {
+		unlocked: state => state.money >= 5,
+		cost: 5,
+		buy: state => {
+			state.income *= 10;
+		}
+	}
+}
 
 function step() {
-    moneyValue += dt * income;
-    moneyDisplay = Math.round(moneyValue * 100) / 100;
-    money.innerText = "Current  Money: $" + moneyDisplay;
+    state.money += dt * state.income;
+    money = Math.round(state.money * 100) / 100;
+    document.getElementById('money').innerText = "Current Money: $" + money;
 
-    energyValue -= dt * 0.01; 
-    energyDisplay = Math.round(energyValue * 10) / 10;
-    energy.innerText = "Current energy: " + energyDisplay;
+    state.energy -= dt * 0.01; 
+    energy = Math.round(state.energy * 10) / 10;
+    document.getElementById('energy').innerText = "Current Energy: " + energy;
 
-    if (moneyValue >= 5 && doubleIncomeConsumed == 0) {
-        document.getElementById("doubleIncome").style = "";
+    for (const name in upgradeData) {
+		if (!state.upgrades[name].researched && upgradeData[name].unlocked(state)) {
+			document.getElementById(name).style = "";
+		}
     }
 }
 
 function clickSignButton() {
-    moneyValue += 100;
+    state.money += 100;
 }
 
 function eatFood() {
-    energyValue += 10;
-    moneyValue -= 10;
+    state.energy += 10;
+    state.money -= 10;
 }
 
-function doubleIncome() {
-    if (moneyValue < 5) {
-        return;
-    }
-    moneyValue -= 5;
-    income *= 2;
-    doubleIncomeConsumed = 1;
-    document.getElementById("doubleIncome").style = "display: none;";
+function research(name) {
+	state.money -= upgradeData[name].cost;
+	upgradeData[name].buy(state);
+	document.getElementById(name).style.display = "none";
+	state.upgrades[name].researched = true;
 }
 
 var cancel = setInterval(step, 100);

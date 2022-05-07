@@ -3,18 +3,55 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Incremental Game</title>
+    <title>Sims Idle</title>
+
+    <style>
+        .tabcontent {
+          display: none;
+          padding: 6px 12px;
+          border: 1px solid #ccc;
+          border-top: none;
+        }
+    </style>
 </head>
 
 <body>
-    <h1> Title </h1>
-    <div id='money'></div>
-    <div id='energy'></div>
-    <div onclick="clickSignButton()">Click Me</div>
-    <div onclick="eatFood()">Eat Food</div>
-    <div id="doubleIncome" onclick="doubleIncome()" style="display: none;">Double Income</div>
+    <h1>Sims Idle</h1>
+
+    <div class="tab">
+      <button class="tablinks" onclick="openTab(event, 'Adventure')">Adventure</button>
+      <button class="tablinks" onclick="openTab(event, 'Upgrades')">Upgrades</button>
+    </div>
+
+    <div id="Adventure" class="tabcontent" style="display: block">
+        <div id='money'></div>
+        <div id='energy'></div>
+        <button onclick="clickSignButton()">Click Me</button>
+        <button onclick="eatFood()">Eat Food</button>
+        <button id="doubleIncome" onclick="research('doubleIncome')" style="display: none;">Double Income</button>
+    </div>
+
+    <div id="Upgrades" class="tabcontent">
+        <div id="researched">
+        </div>
+    </div>
 </body>
 
 <script src="main.js"></script>
+
+<script>
+    function openTab(event, tabName) {
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+        document.getElementById(tabName).style.display = "block";
+        event.currentTarget.className += " active";
+    }
+</script>
 
 </html>
