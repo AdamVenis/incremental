@@ -1,73 +1,82 @@
-var dt = 234;
+const mult = 10; // for testing
 
 const state = {
-	money: 0,
-	energy: 100,
-	charisma: 0,
-	day: 0,
-	income: 0.001,
-	upgrades: {},
+    money: 0,
+    energy: 100,
+    charisma: 0,
+    day: 0,
+    begIncome: 0.03,
+    passiveIncome: 0.0,
+    upgrades: {},
 };
 
-var upgradeData = {
-	doubleIncome: {
-		displayName: 'Double Income',
-		unlocked: state => state.money >= 5,
-		cost: 5,
-		buy: state => {
-			state.income *= 10;
-		}
-	},
-	cleanClothes: {
-		displayName: 'Clean Clothes',
-		unlocked: state => state.money >= 15,
-		cost: 25,
-		buy: state => state.charisma += 1
-	}
+const upgradeData = {
+    findSign: {
+        displayName: 'Find A Sign',
+        unlocked: state => state.money >= 0.5,
+        cost: 0.5,
+        buy: state => state.begIncome *= 3
+    },
+    findJar: {
+        displayName: 'Find a Jar',
+        unlocked: state => state.upgrades.cleanClothes.researched,
+        cost: 50,
+        buy: state => state.passiveIncome += 1
+    },
+    cleanClothes: {
+        displayName: 'Clean Clothes',
+        unlocked: state => state.money >= 15,
+        cost: 25,
+        buy: state => state.charisma += 1
+    },
 }
 
 // add upgrades to state
 for (const name in upgradeData) {
-	state.upgrades[name] = {
-		unlocked: false,
-		researched: false
-	};
+    state.upgrades[name] = {
+        unlocked: false,
+        researched: false
+    };
 }
 
 function init() {
-	const adventure = document.getElementById("Adventure");
-	for (const name in upgradeData) {
-		const button = document.createElement("button");
-		const displayText = document.createTextNode(upgradeData[name].displayName);
-		button.appendChild(displayText);
-		button.id = name;
-		button.style="display: none;"
-		button.onclick = () => research(name);
-		adventure.appendChild(button);
-	}
+    const adventure = document.getElementById("Adventure");
+    for (const name in upgradeData) {
+        const button = document.createElement("button");
+        const displayText = document.createTextNode(upgradeData[name].displayName);
+        button.appendChild(displayText);
+        button.id = name;
+        button.style="display: none;"
+        button.onclick = () => research(name);
+        adventure.appendChild(button);
+    }
 }
 
 function step() {
-    state.money += dt * state.income * (1 + state.charisma);
-    state.energy -= dt * 0.01; 
+    state.money += mult * state.passiveIncome * (1 + state.charisma);
+    state.energy -= mult * 0.01; 
 
     document.getElementById('money').innerText = "Current Money: $" + round(state.money, 2);
     document.getElementById('energy').innerText = "Current Energy: " + round(state.energy, 1);
     document.getElementById('charisma').innerText = "Charisma: " + state.charisma;
 
     for (const name in upgradeData) {
-		if (!state.upgrades[name].researched && upgradeData[name].unlocked(state)) {
-			document.getElementById(name).style = "";
-		}
+        if (state.upgrades[name].researched) {
+            continue;
+        } 
+        if (upgradeData[name].unlocked(state)) {
+            document.getElementById(name).style = "";
+            document.getElementById(name).disabled = state.money < upgradeData[name].cost;
+        }
     }
 }
 
 function round(x, d) {
-	return Math.round(x * 10**d) / 10**d;
+    return Math.round(x * 10**d) / 10**d;
 }
 
-function clickSignButton() {
-    state.money += 100;
+function beg() {
+    state.money += mult * state.begIncome;
 }
 
 function eatFood() {
@@ -76,13 +85,13 @@ function eatFood() {
 }
 
 function research(name) {
-	state.money -= upgradeData[name].cost;
-	upgradeData[name].buy(state);
-	document.getElementById(name).style.display = "none";
-	state.upgrades[name].researched = true;
+    state.money -= upgradeData[name].cost;
+    upgradeData[name].buy(state);
+    document.getElementById(name).style.display = "none";
+    state.upgrades[name].researched = true;
 
-	const text = document.createTextNode(upgradeData[name].displayName + '\n');
-	document.getElementById('researched').appendChild(text);
+    const text = document.createTextNode(upgradeData[name].displayName + '\n');
+    document.getElementById('researched').appendChild(text);
 }
 
 init();
