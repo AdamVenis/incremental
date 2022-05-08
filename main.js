@@ -50,15 +50,28 @@ function init() {
         button.onclick = () => research(name);
         adventure.appendChild(button);
     }
+
+    const stats = ["money", "energy", "charisma"];
+    for (let i = 0; i < stats.length; i++) {
+        const div = document.createElement("div");
+        div.id = stats[i];
+        adventure.insertBefore(div, adventure.children[i]);
+    }
 }
 
-function step() {
+function updateState() {
     state.money += mult * state.passiveIncome * (1 + state.charisma);
     state.energy -= mult * 0.01; 
+}
 
-    document.getElementById('money').innerText = "Current Money: $" + round(state.money, 2);
-    document.getElementById('energy').innerText = "Current Energy: " + round(state.energy, 1);
-    document.getElementById('charisma').innerText = "Charisma: " + state.charisma;
+function render() {
+    const adventure = document.getElementById("Adventure");
+
+    document.getElementById("money").innerText = "Current Money: $" + round(state.money, 2);
+    document.getElementById("energy").innerText = "Current Energy: " + round(state.energy, 1);
+    if (state.charisma > 0) {
+        document.getElementById('charisma').innerText = "Charisma: " + state.charisma;   
+    }
 
     for (const name in upgradeData) {
         if (state.upgrades[name].researched) {
@@ -69,6 +82,11 @@ function step() {
             document.getElementById(name).disabled = state.money < upgradeData[name].cost;
         }
     }
+}
+
+function step() {
+    updateState();
+    render();
 }
 
 function round(x, d) {
