@@ -13,6 +13,7 @@
     <div class="tab">
       <button class="tablinks" onclick="openTab(event, 'Adventure')">Adventure</button>
       <button class="tablinks" onclick="openTab(event, 'Upgrades')">Upgrades</button>
+      <button class="tablinks" onclick="openTab(event, 'Jobs')" id="Jobs" style="display: none;">Jobs</button>
     </div>
 
     <div id="Adventure" class="tabcontent" style="display: block">
@@ -23,6 +24,9 @@
     <div id="Upgrades" class="tabcontent">
         <div id="researched">
         </div>
+    </div>
+
+    <div id="Jobs" class="tabcontent">
     </div>
 </body>
 
@@ -42,5 +46,4 @@
         event.currentTarget.className += " active";
     }
 </script>
-
 </html>
