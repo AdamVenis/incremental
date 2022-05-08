@@ -1,4 +1,4 @@
-var dt = 300;
+var dt = 234;
 
 const state = {
 	money: 0,
@@ -51,10 +51,8 @@ function step() {
     state.money += dt * state.income * (1 + state.charisma);
     state.energy -= dt * 0.01; 
 
-    money = Math.round(state.money * 100) / 100;
-    document.getElementById('money').innerText = "Current Money: $" + money;
-    energy = Math.round(state.energy * 10) / 10;
-    document.getElementById('energy').innerText = "Current Energy: " + energy;
+    document.getElementById('money').innerText = "Current Money: $" + round(state.money, 2);
+    document.getElementById('energy').innerText = "Current Energy: " + round(state.energy, 1);
     document.getElementById('charisma').innerText = "Charisma: " + state.charisma;
 
     for (const name in upgradeData) {
@@ -62,6 +60,10 @@ function step() {
 			document.getElementById(name).style = "";
 		}
     }
+}
+
+function round(x, d) {
+	return Math.round(x * 10**d) / 10**d;
 }
 
 function clickSignButton() {
@@ -78,6 +80,9 @@ function research(name) {
 	upgradeData[name].buy(state);
 	document.getElementById(name).style.display = "none";
 	state.upgrades[name].researched = true;
+
+	const text = document.createTextNode(upgradeData[name].displayName + '\n');
+	document.getElementById('researched').appendChild(text);
 }
 
 init();
