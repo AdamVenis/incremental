@@ -1,4 +1,4 @@
-const mult = 10000; // for testing
+const mult = 10; // for testing
 
 const state = {
     money: 0,
@@ -86,12 +86,58 @@ const upgradeData = {
             state.currentJob = null;
         }
     },
-    ged: {
-        displayName: 'Get your GED (Education +3)',
-        toolTip: 'Become educated',
+    scheduleWork: {
+        displayName: 'Work Mon-Fri',
+        toolTip: 'Gain automatic salary',
         unlocked: state => state.upgrades.phone.researched,
         cost: 1000,
-        buy: state => state.education += 3
+        buy: state => {
+            if (state.currentJob in jobData) {
+                state.passiveIncome = jobData[state.currentJob].salary / 10;
+            }
+        }
+    },
+    ged: {
+        displayName: 'Get your GED (Education +10)',
+        toolTip: 'Become educated',
+        unlocked: state => state.upgrades.phone.researched,
+        cost: 1500,
+        buy: state => state.education += 10
+    },
+    bachelors: {
+        displayName: 'Get your Bachelors (Education +100)',
+        toolTip: 'Become educated',
+        unlocked: state => state.upgrades.ged.researched,
+        cost: 1500,
+        buy: state => state.education += 100
+    },
+    gucci: {
+        displayName: 'Buy Gucci Clothes',
+        toolTip: 'Get drip',
+        unlocked: state => state.upgrades.ged.researched,
+        cost: 2000,
+        buy: state => state.charisma += 100
+    },
+    masters: {
+        displayName: 'Get your GED (Education +1000)',
+        toolTip: 'Become educated',
+        unlocked: state => state.upgrades.bachelors.researched,
+        cost: 2500,
+        buy: state => state.education += 1000
+    },
+    phd: {
+        displayName: 'Get your GED (Education +10000)',
+        toolTip: 'Become educated',
+        unlocked: state => state.upgrades.masters.researched,
+        cost: 5000,
+        buy: state => state.education += 10000
+    },
+    overthrowGovernment: {
+        displayName: 'Overthrow the Government',
+        toolTip: 'win',
+        unlocked: state => state.upgrades.masters.researched,
+        cost: 100000,
+        buy: state => { return; }
     },
 }
 
@@ -118,77 +164,87 @@ const jobData = {
     landscaper: {
         displayName: 'Landscaper',
         toolTip: 'Pays $14.76/hr',
-        requirementsMet: state => {
-            state.money >= 500,
+        requirementsMet: state => (
+            state.money >= 500 &&
             state.education >= 10
-        },
+        ),
         salary: 14.76
     },
     privateInvestigator: {
         displayName: 'Private Investigator',
         toolTip: 'Pays $17.97/hr',
-        requirementsMet: state => {
-            state.money >= 1000,
+        requirementsMet: state => (
+            state.money >= 1000 &&
             state.education >= 10
-        },
+        ),
         salary: 17.97
     },
     carpenter: {
         displayName: 'Carpenter',
         toolTip: 'Pays $20.73/hr',
-        requirementsMet: state => {
-            state.money >= 500,
+        requirementsMet: state => (
+            state.money >= 500 &&
             state.education >= 10
-        },
+        ),
         salary: 20.73
     },
     firefighter: {
         displayName: 'Firefighter',
         toolTip: 'Pays $22.14/hr',
-        requirementsMet: state => {
-            state.money >= 500,
+        requirementsMet: state => (
+            state.money >= 500 &&
             state.education >= 10
-        },
+        ),
         salary: 22.14
     },
     plumber: {
         displayName: 'Plumber',
         toolTip: 'Pays $24.26/hr',
-        requirementsMet: state => {
-            state.money >= 500,
+        requirementsMet: state => (
+            state.money >= 500 &&
             state.education >= 10
-        },
+        ),
         salary: 24.26
     },
     truckDriver: {
         displayName: 'Truck Driver',
         toolTip: 'Pays $30.45/hr',
-        requirementsMet: state => {
-            state.money >= 500,
+        requirementsMet: state => (
+            state.money >= 500 &&
             state.education >= 10
-        },
+        ),
         salary: 30.45
     },
     salesman: {
         displayName: 'Sales',
         toolTip: 'Pays $32.96/hr',
-        requirementsMet: state => {
-            state.money >= 500,
-            state.education >= 10
+        requirementsMet: state => (
+            state.money >= 500 &&
+            state.education >= 10 &&
             state.charisma >= 10
-        },
+        ),
         salary: 32.96
     },
     // beyond here need bachelors
     humanResources: {
         displayName: 'Human Resources',
         toolTip: 'Pays $35.28/hr',
-        requirementsMet: state => {
-            state.money >= 500,
-            state.education >= 20
+        requirementsMet: state => (
+            state.money >= 500 &&
+            state.education >= 20 &&
             state.charisma >= 10
-        },
+        ),
         salary: 35.28
+    },
+    softwareEngineer: {
+        displayName: 'Software Engineer',
+        toolTip: 'Pays $100/hr',
+        requirementsMet: state => (
+            state.money >= 500 &&
+            state.education >= 100 &&
+            state.charisma >= 10
+        ),
+        salary: 100
     },
 }
 
@@ -263,7 +319,8 @@ function render() {
         document.getElementById('jobslink').style.display = '';
         if (state.currentJob in jobData) {
             const jobName = jobData[state.currentJob].displayName;
-            document.getElementById('currentJob').innerText = "Current Job: " + jobName;   
+            document.getElementById('currentJob').innerText = "Current Job: " + jobName; 
+            document.getElementById('beg').innerText = "Work";  
         }
     }
 
@@ -301,7 +358,13 @@ function round(x, d) {
 }
 
 function beg() {
-    state.money += mult * state.begIncome * state.energy / 100;
+    let moneyEarned = 0;
+    if (state.currentJob in jobData) {
+        moneyEarned = mult * state.energy / 100 * jobData[state.currentJob].salary / 10;   
+    } else {
+        moneyEarned = mult * state.energy / 100 * state.begIncome;   
+    }
+    state.money += moneyEarned;
 }
 
 function eatFood() {
