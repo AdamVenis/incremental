@@ -13,12 +13,12 @@
     <div class="tab">
       <button class="tablinks" onclick="openTab(event, 'Adventure')">Adventure</button>
       <button class="tablinks" onclick="openTab(event, 'Upgrades')">Upgrades</button>
-      <button class="tablinks" onclick="openTab(event, 'Jobs')" id="Jobs" style="display: none;">Jobs</button>
+      <button class="tablinks" onclick="openTab(event, 'Jobs')" id="jobslink" style="display: none;">Jobs</button>
     </div>
 
     <div id="Adventure" class="tabcontent" style="display: block">
         <button onclick="beg()">Beg</button>
-        <button onclick="eatFood()">Eat Food</button>
+        <button onclick="eatFood()">Eat Basic Food</button>
     </div>
 
     <div id="Upgrades" class="tabcontent">
@@ -27,6 +27,8 @@
     </div>
 
     <div id="Jobs" class="tabcontent">
+        <div id="selectableJobs">Select:</div>
+        <div id="unlockableJobs" class="unlockableJobs">Unlock:</div>
     </div>
 </body>
 
