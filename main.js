@@ -1,4 +1,4 @@
-const mult = 10; // for testing
+const mult = 3; // for testing
 
 const state = {
     money: 0,
@@ -10,7 +10,7 @@ const state = {
 
 const stats = ["money", "energy", "passiveIncome", "charisma", "education", "fitness", "currentJob"];
 for (stat of stats) {
-    if (!(stat in state)) {
+    if (!(stat in state) && stat != "currentJob") {
         state[stat] = 0;
     }
 }
@@ -119,14 +119,14 @@ const upgradeData = {
         buy: state => state.charisma += 100
     },
     masters: {
-        displayName: 'Get your GED (Education +1000)',
+        displayName: 'Get your Masters (Education +1000)',
         toolTip: 'Become educated',
         unlocked: state => state.upgrades.bachelors.researched,
         cost: 2500,
         buy: state => state.education += 1000
     },
     phd: {
-        displayName: 'Get your GED (Education +10000)',
+        displayName: 'Get your PhD (Education +10000)',
         toolTip: 'Become educated',
         unlocked: state => state.upgrades.masters.researched,
         cost: 5000,
@@ -137,7 +137,10 @@ const upgradeData = {
         toolTip: 'win',
         unlocked: state => state.upgrades.masters.researched,
         cost: 100000,
-        buy: state => { return; }
+        buy: state => { 
+            state.money = 0; 
+            state.passiveIncome = 0;
+        }
     },
 }
 
@@ -337,7 +340,6 @@ function render() {
         }
     }
 
-    // const jobsDiv = document.getElementById("unlockableJobs");
     for (jobName in jobData) {
         jobUnlock = document.getElementById("unlock-" + jobName);
         jobUnlock.disabled = !jobData[jobName].requirementsMet(state);
